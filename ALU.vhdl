@@ -52,4 +52,4 @@ begin
                      branchReg(31 downto 0);
 
 
-end Structure;
+end structure;
