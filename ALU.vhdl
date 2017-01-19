@@ -1,58 +1,55 @@
-LIBRARY ieee;
-USE ieee.std_logic_1164.all;
+library ieee;
+use ieee.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-ENTITY alu IS
-        PORT (x : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-              y : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-              op : IN STD_LOGIC_VECTOR(6 DOWNTO 0);
-              w : OUT STD_LOGIC_VECTOR(32 DOWNTO 0);
-              z : OUT STD_LOGIC);
-END alu;
+entity alu IS
+   port (x : in  std_logic_vector(31 downto 0);
+         y : in  std_logic_vector(31 downto 0);
+         op : in std_logic_vector(6 downto 0);
+         w : out std_logic_vector(32 downto 0));
+end alu;
 
 
 
-ARCHITECTURE Structure OF alu IS
+architecture structure of alu is
 
-signal aritReg : STD_LOGIC_VECTOR(31 DOWNTO 0);
-signal memReg : STD_LOGIC_VECTOR(31 DOWNTO 0);
-signal branchReg : STD_LOGIC_VECTOR(31 DOWNTO 0);
+   signal aritReg : std_logic_vector(31 downto 0);
+   signal memReg : std_logic_vector(31 downto 0);
+   signal branchReg : std_logic_vector(31 downto 0);
 
-        --ALU Operations Encoding: 
-        --000 0000   ADD 
-        --000 0001   SUB  
-        --000 0010   MUL
-        
+   --ALU Operations Encoding: 
+   --000 0000   ADD 
+   --000 0001   SUB  
+   --000 0010   MUL
+      
 	--001 0000   LDB 
-        --001 0001   LDW
-        --001 0010   STB 
-        --001 0011   STW
-        --001 0100   MOV
+   --001 0001   LDW
+   --001 0010   STB 
+   --001 0011   STW
+   --001 0100   MOV
         
 	--011 0000   BEQ
-        --011 0001   JUMP
-        --011 0010   TLBWRITE
-        --011 0011   IRET
+   --011 0001   JUMP
+   --011 0010   TLBWRITE
+   --011 0011   IRET
        
 
 
 
 
-BEGIN
+begin
 	
-	aritReg <= std_logic_vector(signed(x) * signed(y)) when op = "0000010" else
-                   std_logic_vector(signed(x) - signed(y)) when op = "0000001" else
-                   std_logic_vector(signed(x) + signed(y));	
+   aritReg <= std_logic_vector(signed(x) * signed(y)) when op = "0000010" else
+              std_logic_vector(signed(x) - signed(y)) when op = "0000001" else
+              std_logic_vector(signed(x) + signed(y));	
 	
-	memReg <= std_logic_vector(signed(x) + signed(y));
-	branchReg <= std_logic_vector(signed(x) + signed(y));
+   memReg <= std_logic_vector(signed(x) + signed(y));
 
-	w(31 downto 0) <= aritReg(31 downto 0) when op <= "0000010" and op >= "0000000" else
-                          memReg(31 downto 0) when op <= "0010100" and op >= "0010000" else
-                          branchReg(31 downto 0);
+   branchReg <= std_logic_vector(signed(x) + signed(y));
 
-	z <= '1' when y = x"0000" else
-             '0';
+   w(31 downto 0) <= aritReg(31 downto 0) when op <= "0000010" and op >= "0000000" else
+                     memReg(31 downto 0) when op <= "0010100" and op >= "0010000" else
+                     branchReg(31 downto 0);
 
 
-END Structure;
+end Structure;
