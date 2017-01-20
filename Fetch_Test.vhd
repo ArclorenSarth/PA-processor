@@ -10,7 +10,7 @@ architecture behaviour of Fetch_Test is
 	component Fetch
 	port (clk : in std_logic;
           muxIF : in std_logic;
-          boot : in std_logic;
+          reset : in std_logic;
           PCPlus4F : in std_logic_vector(31 downto 0);
           PCLocation : in std_logic_vector(31 downto 0);
           inst, PC : out std_logic_vector(31 downto 0));
@@ -26,7 +26,7 @@ architecture behaviour of Fetch_Test is
     begin
     	Fetch_0: Fetch port map(clk => clk_in,
     							muxIF => muxIF_in,
-                                boot => boot_in,
+                                reset => boot_in,
     							PCPlus4F => PC_out,
     							PCLocation => PCLocation_in,
                                 inst => inst_in,

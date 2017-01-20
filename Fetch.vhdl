@@ -7,7 +7,7 @@ use std.textio.all;
 entity Fetch is
     port (clk : in std_logic;
           muxIF : in std_logic;
-          boot : in std_logic;
+          reset : in std_logic;
           PCPlus4F : in std_logic_vector(31 downto 0);
           PCLocation : in std_logic_vector(31 downto 0);
           inst, PC : out std_logic_vector(31 downto 0));
@@ -39,8 +39,8 @@ entity Fetch is
 
                 PC <= PCF+X"00000004";
 
-                PC_in <= PCPlus4F when (muxIF='1' and boot='0') else 
-                         X"00001000" when (boot='1') else
+                PC_in <= PCPlus4F when (muxIF='1' and reset='0') else 
+                         X"00001000" when (reset='1') else
                         PCLocation;
 
                 --inst <= inst_data;
