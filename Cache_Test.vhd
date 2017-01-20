@@ -23,6 +23,7 @@ architecture behaviour of Cache_Test is
     signal DATA_IN_in: std_logic_vector(127 downto 0);
     signal data_out_in :  std_logic_vector(31 downto 0);
     signal hit_in: std_logic;
+    signal good_data: std_logic_vector(31 downto 0);
 
     begin
     	Cache_0: Cache port map(ADDR => ADDR_in,
@@ -35,37 +36,38 @@ architecture behaviour of Cache_Test is
 
   test_process: process begin
         loop
-            wait for 1 ns;
+            wait for 2 ns;
             ADDR_in <= x"00000000";
             RW_in <= '1';
             RAW_CONTROL_in <='1';
             DATA_IN_in <= x"11111111000000000000000000000000";
             wait for 2 ns;
-            ADDR_in <= x"00000008";
+            ADDR_in <= x"00000010";
             RAW_CONTROL_in <='0';
             wait for 1 ns;
-            RW_in <= '1';
             RAW_CONTROL_in <='1';
             DATA_IN_in <= x"11111111111111110000000000000000";
             wait for 2 ns;
-            ADDR_in <= x"00000010";
+            ADDR_in <= x"00000020";
             RAW_CONTROL_in <='0';
             wait for 1 ns;
-            RW_in <= '1';
             RAW_CONTROL_in <='1';
-            DATA_IN_in <= x"11111111111111111111111100000000";
+            DATA_IN_in <= x"11111111111111111111111133333333";
             wait for 2 ns;
-            ADDR_in <= x"00000018";
+            ADDR_in <= x"00000030";
             RAW_CONTROL_in <='0';
             wait for 1 ns;
-            RW_in <= '1';
             RAW_CONTROL_in <='1';
             DATA_IN_in <= x"11111111111111111111111122222222";
-            wait for 2 ns;
-            ADDR_in <= x"00000010";
+            wait for 1 ns;
+            ADDR_in <= x"0000002C";
             RW_in <= '0';
-            --RAW_CONTROL_in <='1';
+            RAW_CONTROL_in <='0';
+            wait for 1 ns;
+            ADDR_in <= x"00000020";
         end loop;
   end process;
+
+  good_data <= data_out_in when hit_in='1' else "UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU";
 
   end behaviour;
