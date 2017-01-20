@@ -46,14 +46,13 @@ entity Fetch is
                 --inst <= inst_data;
     
             -- Instruction Memory
-               -- inst_memory: entity work.sram64kx8(sram_behaviour)
-                    --port map (inst_ncs, PCF, inst_data, inst_nwe, inst_noe);
+                inst_memory: entity work.sram64kx8(sram_behaviour)
+                    port map (inst_ncs, PCF, inst_data, inst_nwe, inst_noe);
                 
                     -- never write to instruction memory
                     inst_nwe <= '1';
                     inst_noe <= '0';
                     inst_ncs <= '1' when PCF(0)='U' else '0';
                     
-                    inst_data <= X"11111111";
                     inst<=inst_data;
 end behaviour;
