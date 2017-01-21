@@ -31,7 +31,7 @@ entity sram64kx8 is
 
   port (ncs : in std_logic;       -- not chip select
 	addr: in std_logic_vector( 31 downto 0 );
-        data: inout std_logic_vector( 31 downto 0 );
+        data: inout std_logic_vector( 127 downto 0 );
         nwe : in std_logic;       -- not write enable
         noe : in std_logic        -- not output enable
        );
@@ -119,7 +119,7 @@ begin
 
    begin
       load( mem );
-      data <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ" ;
+      data <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ" ;
       --
       --
       -- process memory cycles
@@ -135,8 +135,20 @@ begin
                mem( address + 1 ) := data(15 downto 8);
                mem( address + 2 ) := data(23 downto 16);
                mem( address + 3 ) := data(31 downto 24);
+               mem( address + 4 ) := data(39 downto 32);
+               mem( address + 5 ) := data(47 downto 40);
+               mem( address + 6 ) := data(55 downto 48);
+               mem( address + 7 ) := data(63 downto 56);
+               mem( address + 8 ) := data(71 downto 64);
+               mem( address + 9 ) := data(79 downto 72);
+               mem( address + 10 ) := data(87 downto 80);
+               mem( address + 11 ) := data(95 downto 88);
+               mem( address + 12 ) := data(103 downto 96);
+               mem( address + 13 ) := data(111 downto 104);
+               mem( address + 14 ) := data(119 downto 112);
+               mem( address + 15 ) := data(127 downto 120);
 
-               data <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+               data <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
             elsif nwe = '1' then
                -- read cycle
                if noe = '0' then
@@ -144,14 +156,26 @@ begin
                   data(15 downto 8) <= mem( address + 1);
                   data(23 downto 16) <= mem( address + 2);
                   data(31 downto 24) <= mem( address + 3);
+                  data(39 downto 32) <= mem( address + 4);
+                  data(47 downto 40) <= mem( address + 5);
+                  data(55 downto 48) <= mem( address + 6);
+                  data(63 downto 56) <= mem( address + 7);
+                  data(71 downto 64) <= mem( address + 8);
+                  data(79 downto 72) <= mem( address + 9);
+                  data(87 downto 80) <= mem( address + 10);
+                  data(95 downto 88) <= mem( address + 11);
+                  data(103 downto 96) <= mem( address + 12);
+                  data(111 downto 104) <= mem( address + 13);
+                  data(119 downto 112) <= mem( address + 14);
+                  data(127 downto 120) <= mem( address + 15);
                else 
-                  data <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+                  data <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
                end if;
             else
-               data <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+               data <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
             end if;
 	  else
-              data <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+              data <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
 	  end if;
 
          wait on ncs, nwe, noe, addr, data; -- FNH, 29.1.99: added data
