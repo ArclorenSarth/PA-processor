@@ -18,7 +18,7 @@ entity Fetch is
         signal PC_in: std_logic_vector(31 downto 0);
         signal PCF: std_logic_vector(31 downto 0);
 
-        signal inst_data: std_logic_vector(31 downto 0);
+        signal inst_data: std_logic_vector(127 downto 0);
         signal inst_nwe: std_logic;
         signal inst_noe: std_logic;
         signal inst_ncs: std_logic;
@@ -54,5 +54,5 @@ entity Fetch is
                     inst_noe <= '0';
                     inst_ncs <= '1' when PCF(0)='U' else '0';
                     
-                    inst<=inst_data;
+                    inst<=inst_data(31 downto 0); -- need multiplexos to choose which word select
 end behaviour;

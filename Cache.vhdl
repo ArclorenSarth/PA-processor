@@ -29,7 +29,7 @@ architecture behav of Cache is
 
 	signal data_store: data_store_type;
 	signal tag_store: tag_store_type;
-	signal valid_store: valid_store_type;
+	signal valid_store: valid_store_type := "0000";
 
 	begin
 
@@ -50,7 +50,7 @@ architecture behav of Cache is
 		--ON WRITE
 		data_store(to_integer(unsigned(set))) <= DATA_IN when (RW='1' and RW_CONTROL='1');
 
-		valid_store(to_integer(unsigned(set))) <= '1' when (RW='1' and RW_CONTROL='1');
+		valid_store(to_integer(unsigned(set))) <= '1' when (RW='1' and RW_CONTROL='1') else '0';
 
 		tag_store(to_integer(unsigned(set))) <= tag; 
 

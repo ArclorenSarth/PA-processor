@@ -7,7 +7,7 @@ end Fetch_Test;
 
 architecture behaviour of Fetch_Test is
 	
-	component Fetch
+	component Fetch_Full
 	port (clk : in std_logic;
           muxIF : in std_logic;
           reset : in std_logic;
@@ -16,7 +16,7 @@ architecture behaviour of Fetch_Test is
           inst, PC : out std_logic_vector(31 downto 0));
 	end component;
 
-	for Fetch_0: Fetch use entity work.Fetch;
+	for Fetch_0: Fetch_Full use entity work.Fetch_Full;
 		signal clk_in :  std_logic;
 		signal muxIF_in : std_logic;
         signal boot_in :  std_logic;
@@ -24,7 +24,7 @@ architecture behaviour of Fetch_Test is
         signal PC_out :  std_logic_vector(31 downto 0);
 
     begin
-    	Fetch_0: Fetch port map(clk => clk_in,
+    	Fetch_0: Fetch_Full port map(clk => clk_in,
     							muxIF => muxIF_in,
                                 reset => boot_in,
     							PCPlus4F => PC_out,
@@ -49,13 +49,14 @@ architecture behaviour of Fetch_Test is
 
   boot_process: process begin
         loop
-            wait for 2 ns;
-            boot_in <= '1';
-            --PCPlus4F_in <= X"00001000";
-            --PC_out <= X"00001000";
-            wait for 2 ns;
-            boot_in<='0';
-            wait for 10 ns;
+            --if rising_edge(clk_in) then
+                boot_in <= '1';
+                wait for 1 ns;
+            --end if ;
+            --if rising_edge(clk_in) then
+                boot_in <= '0';
+            --end if ;
+            wait for 100 ns;
         end loop;
   end process;
 
