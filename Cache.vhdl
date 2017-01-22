@@ -38,21 +38,22 @@ architecture behav of Cache is
 		block_offset <= ADDR(3 downto 2);
 		byte_ofset <= ADDR(1 downto 0);
 		--ON READ
-		tag_eq <= '1' when to_integer(unsigned(tag_store(to_integer(unsigned(set)))))= to_integer(unsigned(tag)) else '0';
+		tag_eq <= '1' when to_integer(unsigned(tag_store(to_integer(unsigned(set)))))= to_integer(unsigned(tag)) and RW_CONTROL='1' else '0';
 		hit <= '1' when (tag_eq='1' and valid_store(to_integer(unsigned(set)))='1') else '0';
 
-		data_out <= data_store(to_integer(unsigned(set)))(127 downto 96) when RW='0' and RW_CONTROL='0' and  block_offset="11" else
-				data_store(to_integer(unsigned(set)))(95 downto 64) when RW='0' and RW_CONTROL='0' and block_offset="10" else
-				data_store(to_integer(unsigned(set)))(63 downto 32) when RW='0' and RW_CONTROL='0' and block_offset="01" else
-				data_store(to_integer(unsigned(set)))(31 downto 0) when RW='0' and RW_CONTROL='0' and block_offset="00" else
+
+		data_out <= data_store(to_integer(unsigned(set)))(127 downto 96) when RW_CONTROL='1' and  block_offset="11" else
+				data_store(to_integer(unsigned(set)))(95 downto 64) when RW_CONTROL='1' and block_offset="10" else
+				data_store(to_integer(unsigned(set)))(63 downto 32) when RW_CONTROL='1' and block_offset="01" else
+				data_store(to_integer(unsigned(set)))(31 downto 0) when RW_CONTROL='1' and block_offset="00" else
 				"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
 		--ON WRITE
 		data_store(to_integer(unsigned(set))) <= DATA_IN when (RW='1' and RW_CONTROL='1');
 
-		valid_store(to_integer(unsigned(set))) <= '1' when (RW='1' and RW_CONTROL='1') else '0';
+		valid_store(to_integer(unsigned(set))) <= '1' when (RW='1' and RW_CONTROL='1');
 
-		tag_store(to_integer(unsigned(set))) <= tag; 
+		tag_store(to_integer(unsigned(set))) <= tag when (RW='1' and RW_CONTROL='1'); 
 
 
 end behav;

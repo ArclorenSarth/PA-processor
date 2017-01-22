@@ -30,10 +30,11 @@ entity sram64kx8 is
   generic (rom_data_file_name: string := "/home/ivanmar/Documents/PA-processor/memory.dat");
 
   port (ncs : in std_logic;       -- not chip select
-	addr: in std_logic_vector( 31 downto 0 );
+	      addr: in std_logic_vector( 31 downto 0 );
         data: inout std_logic_vector( 127 downto 0 );
         nwe : in std_logic;       -- not write enable
-        noe : in std_logic        -- not output enable
+        noe : in std_logic;        -- not output enable
+        done: out std_logic
        );
 
 end sram64kx8;
@@ -124,6 +125,7 @@ begin
       --
       -- process memory cycles
       --
+      done<='1';
       loop
 	  if (ncs = '0') then
             -- decode address
@@ -147,7 +149,7 @@ begin
                mem( address + 13 ) := data(111 downto 104);
                mem( address + 14 ) := data(119 downto 112);
                mem( address + 15 ) := data(127 downto 120);
-
+               done<='1';
                data <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
             elsif nwe = '1' then
                -- read cycle
@@ -168,8 +170,10 @@ begin
                   data(111 downto 104) <= mem( address + 13);
                   data(119 downto 112) <= mem( address + 14);
                   data(127 downto 120) <= mem( address + 15);
+                  done<='1';
                else 
                   data <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+                  done<='0';
                end if;
             else
                data <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";

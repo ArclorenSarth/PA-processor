@@ -11,7 +11,7 @@ architecture behaviour of Fetch_Test is
 	port (clk : in std_logic;
           muxIF : in std_logic;
           reset : in std_logic;
-          PCPlus4F : in std_logic_vector(31 downto 0);
+          FWWE: in std_logic;
           PCLocation : in std_logic_vector(31 downto 0);
           inst, PC : out std_logic_vector(31 downto 0));
 	end component;
@@ -20,6 +20,7 @@ architecture behaviour of Fetch_Test is
 		signal clk_in :  std_logic;
 		signal muxIF_in : std_logic;
         signal boot_in :  std_logic;
+        signal fwwe_in : std_logic;
         signal PCLocation_in, inst_in : std_logic_vector(31 downto 0);
         signal PC_out :  std_logic_vector(31 downto 0);
 
@@ -27,7 +28,7 @@ architecture behaviour of Fetch_Test is
     	Fetch_0: Fetch_Full port map(clk => clk_in,
     							muxIF => muxIF_in,
                                 reset => boot_in,
-    							PCPlus4F => PC_out,
+                                FWWE => fwwe_in,
     							PCLocation => PCLocation_in,
                                 inst => inst_in,
     							PC => PC_out
@@ -45,16 +46,25 @@ architecture behaviour of Fetch_Test is
 
     muxIF_in <= '1';
 
+
   --PCPlus4F_in<=PC_out;
 
   boot_process: process begin
         loop
             --if rising_edge(clk_in) then
                 boot_in <= '1';
+                --fwwe_in <= '0';
                 wait for 1 ns;
             --end if ;
             --if rising_edge(clk_in) then
+
+                wait for 1 ns;
                 boot_in <= '0';
+                --fwwe_in <= '0';
+
+                wait for 1 ns;
+                --fwwe_in <= '1';
+
             --end if ;
             wait for 100 ns;
         end loop;
