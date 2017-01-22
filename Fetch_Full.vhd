@@ -102,9 +102,9 @@ entity Fetch_Full is
 
                 PCregister : Reg generic map(32) port map(PCPlus4F,clk,fwwe_in,reset,PCF);
 
-                PC<=PCPlus4F when (muxIF='1' and reset='0') else PCLocation;
+                PC<=PCPlus4F;
 
-                PCPlus4F <= PCF+X"00000004";
+                PCPlus4F <= PCF+X"00000004" when (muxIF='1' and reset='0') else PCLocation;
 
                 --inst <= inst_data;
     
