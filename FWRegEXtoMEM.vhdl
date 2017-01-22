@@ -12,6 +12,7 @@ entity FWRegEXtoMEM is
          ctrlRegWriteEX : in std_logic;
          ctrlMemtoRegEX : in std_logic;
          ctrlMemWriteEX : in std_logic;
+         ctrlByteEX : in std_logic;
          ALUoutEX : in std_logic_vector(31 downto 0);
          writeDataEX : in std_logic_vector(31 downto 0);
          writeRegEX : in std_logic_vector(4 downto 0);
@@ -19,6 +20,7 @@ entity FWRegEXtoMEM is
          ctrlRegWriteM : out std_logic;
          ctrlMemtoRegM : out std_logic;
          ctrlMemWriteM : out std_logic;
+         ctrlByteM : out std_logic;
          ALUoutM : out std_logic_vector(31 downto 0);
          writeDataM : out std_logic_vector(31 downto 0);
          writeRegM : out std_logic_vector(4 downto 0));
@@ -51,6 +53,7 @@ begin
    fCtrlRegWrite : FWReg1 port map(ctrlRegWriteEX,clk,we,reset,ctrlRegWriteM);
    fCtrlMemtoReg : FWReg1 port map(ctrlMemtoRegEX,clk,we,reset,ctrlMemtoRegM);
    fCtrlMemWrite : FWReg1 port map(ctrlMemWriteEX,clk,we,reset,ctrlMemWriteM);
+   fCtrlByte : FWReg1 port map(ctrlByteEX,clk,we,reset,ctrlByteM);
    fALUout : FWReg Generic map(32) port map(ALUoutEX,clk,we,reset,ALUoutM);
    fWriteData : FWReg Generic map(32) port map(writeDataEX,clk,we,reset,writeDataM);
    fWriteReg : FWReg Generic map(5) port map(writeRegEX,clk,we,reset,writeRegM);

@@ -11,18 +11,19 @@ entity Execute is
          ctrlALUopEX : in std_logic_vector(6 downto 0);
          ctrlALUsrcEX : in std_logic;
          ctrlRegDestEX : in std_logic;
-         ctrlJalEX : in std_logic;
+         ctrlByteEX : in std_logic;
          
          srcAEX : in std_logic_vector(31 downto 0);
          srcBEX : in std_logic_vector(31 downto 0);
          rtEX : in std_logic_vector(4 downto 0);
          rdEX : in std_logic_vector(4 downto 0);
          signImmEX : in std_logic_vector(31 downto 0);
-         jumpImmEX : in std_logic_vector(31 downto 0);
+         --jumpImmEX : in std_logic_vector(31 downto 0);
          
          ctrlRegWriteM : out std_logic;
          ctrlMemtoRegM : out std_logic;
          ctrlMemWriteM  : out std_logic;
+         ctrlByteM : out std_logic;
 
          ALUoutM : out std_logic_vector(31 downto 0);
          writeDataM : out std_logic_vector(31 downto 0);
@@ -42,10 +43,8 @@ architecture structure of Execute is
    end component;
    
    signal prvSrcBEX : std_logic_vector(31 downto 0);
-   --signal prvWriteRegEX : std_logic_vector(4 downto 0);
-   --signal prvWriteDataEX : std_logic_vector(31 downto 0);
    signal prvALUoutEX : std_logic_vector(31 downto 0);
-   signal prvSignImmEX : std_logic_vector(31 downto 0);
+   
 
 begin
 
@@ -64,14 +63,14 @@ begin
     
    writeDataM(31 downto 0) <= srcBEX(31 downto 0);
 
-   ALUoutM(31 downto 0) <= prvALUoutEX(31 downto 0) when ctrlJalEX = '0' else
-                           jumpImmEx(31 downto 0);
+   ALUoutM(31 downto 0) <= prvALUoutEX(31 downto 0);
 
 
    
    ctrlRegWriteM <= ctrlRegWriteEX;
    ctrlMemtoRegM <= ctrlMemtoRegEX;
    ctrlMemWriteM <= ctrlMemWriteEX;
+   ctrlByteM <= ctrlByteEX;
 
 
 
