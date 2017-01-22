@@ -38,7 +38,7 @@ architecture structure of Execute is
       PORT (x : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
             y : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
             op : IN STD_LOGIC_VECTOR(6 DOWNTO 0);
-            w : OUT STD_LOGIC_VECTOR(32 DOWNTO 0));
+            w : OUT STD_LOGIC_VECTOR(31 DOWNTO 0));
    end component;
    
    signal prvSrcBEX : std_logic_vector(31 downto 0);
@@ -62,7 +62,7 @@ begin
    writeRegM(4 downto 0) <= rtEX(4 downto 0) when ctrlRegDestEX = '0' else
                             rdEX(4 downto 0);
     
-   writeDataM(31 downto 0) <= writeDataEX(31 downto 0);
+   writeDataM(31 downto 0) <= srcBEX(31 downto 0);
 
    ALUoutM(31 downto 0) <= prvALUoutEX(31 downto 0) when ctrlJalEX = '0' else
                            jumpImmEx(31 downto 0);
