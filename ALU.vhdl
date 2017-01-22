@@ -6,7 +6,7 @@ entity alu IS
    port (x : in  std_logic_vector(31 downto 0);
          y : in  std_logic_vector(31 downto 0);
          op : in std_logic_vector(6 downto 0);
-         w : out std_logic_vector(32 downto 0));
+         w : out std_logic_vector(31 downto 0));
 end alu;
 
 
