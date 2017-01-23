@@ -144,6 +144,31 @@ architecture behaviour of DataCache_Test is
             BYTE_OR_WORD_in<='0';
             DATA_IN_FROM_MEMORY_in<=X"00000007000000060000000500000004";
             DATA_IN_FROM_DATAPATH_in<=X"88888888";
+            wait for 2 ns;
+            ADDR_in<=X"00002014";
+            RW_in<='0';
+            RW_CONTROL_in<='1';
+            CPU_OR_MEM_in<='1';
+            BYTE_OR_WORD_in<='0';
+            DATA_IN_FROM_MEMORY_in<=X"00000007000000060000000500000004";
+            DATA_IN_FROM_DATAPATH_in<=X"88888888";
+            wait for 2 ns;
+            ADDR_in<=X"00002000";
+            RW_in<='1';
+            RW_CONTROL_in<='1';
+            CPU_OR_MEM_in<='1';
+            BYTE_OR_WORD_in<='0';
+            DATA_IN_FROM_MEMORY_in<=X"00000007000000060000000500000004";
+            DATA_IN_FROM_DATAPATH_in<=X"88888888";
+            wait for 2 ns;
+            ADDR_in<=X"00002000";
+            RW_in<='0';
+            RW_CONTROL_in<='1';
+            CPU_OR_MEM_in<='1';
+            BYTE_OR_WORD_in<='0';
+            DATA_IN_FROM_MEMORY_in<=X"00000007000000060000000500000004";
+            DATA_IN_FROM_DATAPATH_in<=X"88888888";
+
         end loop;
   end process;
 
