@@ -42,7 +42,7 @@ entity Fetch_Full is
             q   : out std_logic_vector(W-1 downto 0));
         End Component;
 
-        component Cache
+        component InsCache
             port(ADDR: in  std_logic_vector(31 downto 0);
              RW : in std_logic; --- 0=READ / 1=WRITE
              RW_CONTROL: in std_logic; --- 0=Not Permission / 1 = Permission
@@ -51,7 +51,7 @@ entity Fetch_Full is
              hit: out std_logic); ----0=miss / 1=hit
         end component;
 
-        for ICache: Cache use entity work.Cache;
+        for ICache: InsCache use entity work.InsCache;
             signal ADDR_in :  std_logic_vector(31 downto 0);
             signal RW_in : std_logic := '0';
             signal RAW_CONTROL_in :  std_logic := '1';
@@ -62,7 +62,7 @@ entity Fetch_Full is
         
     begin
             --CACHE
-            ICache: Cache port map(ADDR => ADDR_in,
+            ICache: InsCache port map(ADDR => ADDR_in,
                                    RW => RW_in,
                                    RW_CONTROL => RAW_CONTROL_in,
                                    DATA_IN => MemToCacheBuffer,

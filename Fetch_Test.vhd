@@ -50,7 +50,6 @@ architecture behaviour of Fetch_Test is
   --PCPlus4F_in<=PC_out;
 
   boot_process: process begin
-        loop
             --if rising_edge(clk_in) then
                 boot_in <= '1';
                 muxIF_in <='1';
@@ -73,7 +72,11 @@ architecture behaviour of Fetch_Test is
             wait for 4 ns;
             muxIF_in <='1';
             wait for 20 ns;
-        end loop;
+            PCLocation_in<=X"0000100C";
+            muxIF_in <='0';
+            wait for 4 ns;
+            muxIF_in <='1';
+            wait for 20 ns;
   end process;
 
   end behaviour;
