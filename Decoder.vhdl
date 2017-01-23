@@ -5,6 +5,7 @@ use IEEE.numeric_std.all;
 
 entity Decoder is
    port (clk : in std_logic;
+         cacheMiss : in std_logic;
          InstID : in std_logic_vector(31 downto 0);
          PCplus4ID : in std_logic_vector(31 downto 0);
          
@@ -16,11 +17,15 @@ entity Decoder is
          --bypasses
          ALUoutEX : in std_logic_vector(31 downto 0);
          ALUoutM : in std_logic_vector(31 downto 0);
-         ALUoutWB : in std_logic_vector(31 downto 0);
+         --ALUoutWB : in std_logic_vector(31 downto 0);
+         readDataM : in std_logic_vector(31 downto 0);
          writeRegEX : in std_logic_vector(4 downto 0);
          writeRegM : in std_logic_vector(4 downto 0);
+         ALUopOldEX : in std_logic_vector(6 downto 0);
+         ALUopOldM : in std_logic_vector(6 downto 0);
+         ALUopOldWB : in std_logic_vector(6 downto 0);
          
-         
+                  
          
          ctrlRegWriteEX : out std_logic;
          ctrlMemtoRegEX : out std_logic;
@@ -29,13 +34,16 @@ entity Decoder is
          ctrlALUsrcEX : out std_logic;
          ctrlRegDestEX : out std_logic;
          ctrlByteEX : out std_logic;
+         ctrlBypassAEX : out std_logic;
+         ctrlBypassBEX : out std_logic;
          srcAEX : out std_logic_vector(31 downto 0);
          srcBEX : out std_logic_vector(31 downto 0);
          rtEX : out std_logic_vector(4 downto 0);
          rdEX : out std_logic_vector(4 downto 0);
          signImmEX : out std_logic_vector(31 downto 0);
          ctrlJumpIF : out std_logic
-         PClocationIF : out std_logic_vector(31 downto 0));
+         PClocationIF : out std_logic_vector(31 downto 0);
+         forwardingWE : out std_logic);
          
 
 end Decoder;
@@ -64,7 +72,10 @@ architecture structure of Decoder is
    signal rtID : std_logic_vector(4 downto 0);
    signal rdID : std_logic_vector(4 downto 0);
    signal signImmID : std_logic_vector(31 downto 0);
+   signal branchImmID : std_logic_vector(31 downto 0);
    signal jumpImmID : std_logic_vector(31 downto 0);
+   signal branchLocID : std_logic_vector(31 downto 0);
+   signal jumpLocID : std_logic_vector(31 downto 0);
    signal PClocationID : std_logic_vector(31 downto 0));
     
 
@@ -75,6 +86,15 @@ architecture structure of Decoder is
    signal regA : std_logic_vector(31 downto 0);
    signal regB : std_logic_vector(31 downto 0);
 
+   signal opValidEX : std_logic;
+   signal opValidM : std_logic;
+   signal opValidWB : std_logic;
+   
+   signal isLDEX : std_logic;
+   signal isLDM : std_logic;
+   signal isLDWB : std_logic;
+   
+   
 
 
 
@@ -114,7 +134,7 @@ begin
 
 
 
-   --control unit signals
+   --------------------------------control unit signals--------------------------------------
    ctrlRegWriteEX <= '1' when ALUopID="0000000" or ALUopID="0000001" or ALUopID="0000010"  --ALU ops
                            or ALUopID="0010000" or ALUopID="0010001"                       --LDs
                            or ALUopID="0010100" or ALUopID="0010101" else                  --MOVs
@@ -132,33 +152,88 @@ begin
                    '0';
 
    ctrlJumpIF <= '1' when ALUopID="0110001" or ctrlBranchID = '1' else
-                 '0'
+                 '0';
+
+
+   ctrlALUopEX <= ALUopID;
+
+   ctrlALUsrcEX <= '1' when ALUopID >= "0010000" else
+                   '0';
+
+   ctrlRegDestEX <= '1' when ALUopID="0010000" or ALUopID="0010000" else
+                    '0';
+
+   ctrlByteEX <= '1' when ALUopID="0010000" or ALUopID="0010010" else
+                 '0';
+
+   ctrlBypassAEX <= '1' when isLDEX='1' and addrA=writeRegEX else
+                    '0';
+   ctrlBypassBEX <= '1' when isLDEX='1' and addrB=writeRegEX else
+                    '0';
+
+   forwardingWE <= '1'; --TODO: CACHE MISS CONTROL AND THAT
+
+   --TODO: PROCESS FOR MUL OPERATIONS AND THAT
    
-   
-   
-
-
-
-
-
-
-   --end control unit
+   --------------------------end control unit-----------------------------------
 
    
-   --bypasses
+   --------------------------   bypasses-------------------------------------
+   isLDEX <= '1' when ALUopOldEX="0010000" or ALUopOldEX="0010001" else
+             '0';
+   isLDM  <= '1' when ALUopOldM="0010000" or ALUopOldM="0010001" else
+             '0';
+   isLDWB <= '1' when ALUopOldWB="0010000" or ALUopOldWB="0010001" else
+             '0';
+
+
+   opValidEX <= '1' when ALUopOldEX<"0010000"                              --ALUs
+                    or ALUopOldEX="0010100" or ALUopOldEX="0010101" else   --MOVs
+                '0';
+   opValidM  <= '1' when ALUopOldM<"0010000"                                --ALUs
+                    or ALUopOldM="0010100" or ALUopOldM="0010101"           --MOVs
+                    or ALUopOldM="0010000" or ALUopOldM="0010001" else      --LDs
+                '0';
+   opValidWB <= '1' when ALUopOldWB<"0010000"                              --ALUs
+                    or ALUopOldWB="0010100" or ALUopOldWB="0010101"        --MOVs
+                    or ALUopOldWB="0010000" or ALUopOldWB="0010001" else   --LDs
+                '0';         
+                  
+   srcAID <= ALUoutEX when opValidEX='1' and addrA=writeRegEX else
+             ALUoutM when opValidM='1' and addrA=writeRegM and isLDM='0' else
+             readDataM when opValidM='1' and addrA=writeRegM and isLDM='1' else
+             resultWB when opValidWB='1' and addrA=writeRegWB else
+             regA;
    
-   --end bypasses
+   srcBID <= ALUoutEX when opValidEX='1' and addrB=writeRegEX else
+             ALUoutM  when opValidM='1' and addrB=writeRegM and isLDM='0' else
+             readDataM when opValidM='1' and addrB=writeRegM and isLDM='1' else
+             resultWB when opValidWB='1' and addrB=writeRegWB else
+             regB;
+   ------------------------------end bypasses------------------------------------
 
    ALUopID <= InstID(31 downto 25);
-   addrA <= InstID(24 downto 20);
-   addrB <= InstID(19 downto 15);
-   srcAID <= regA; --TODO: or Bypasses comp with rtID/rdID
-   srcBID <= regB; --TODO: or Bypasses comp with rtID/rdID
+   addrA <= InstID(19 downto 15);
+   addrB <= InstID(14 downto 10);
+   --srcAID <= regA; --DONE ALREADY ON BYPASSES
+   --srcBID <= regB; --DONE ALREADY ON BYPASSES
 
    signImmID(14 downto 0) <= InstID(14 downto 0);
    signImmID(31 downto 15) <= (others = InstID(14));
-   jumpImmID <= std_logic_vector(shift_left(signed(signExt),2);
-   PClocationID <= std_logic_vector(signed(jumpImm) + signed(PCplus4ID));
+   
+   branchImmID(9 downto 0) <= InstID(9 downto 0);
+   branchImmID(14 downto 10) <= InstID(24 downto 20);
+   branchImmID(31 downto 15) <= (others = InstID(24));
+
+   jumpImmID(14 downto 0) <= InstID(14 downto 0);
+   jumpImmID(19 downto 15) <= InstID(24 downto 20);
+   jumpImmID(31 downto 25) <= (others = InstID(24));  
+
+   branchLocID <= (std_logic_vector(signed(shift_left(signed(branchImmID),2)) + signed(PCplus4ID));   
+   jumpLocID <= (std_logic_vector(signed(shift_left(signed(jumpImmID),2)) + signed(PCplus4ID));
+   
+   PClocationID <= jumpLocID when ALUopID="0110001" else
+                   branchLocID;                          --std_logic_vector(signed(jumpImm) + signed(PCplus4ID));
 
    rtID <= InstID(24 downto 20);
    rdID <= InstID(19 downto 15);
