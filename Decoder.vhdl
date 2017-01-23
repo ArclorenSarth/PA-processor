@@ -34,8 +34,9 @@ entity Decoder is
          rtEX : out std_logic_vector(4 downto 0);
          rdEX : out std_logic_vector(4 downto 0);
          signImmEX : out std_logic_vector(31 downto 0);
-         jumpImmEX : out std_logic_vector(31 downto 0);
-         PClocationEX : out std_logic_vector(31 downto 0));
+         ctrlJumpIF : out std_logic
+         PClocationIF : out std_logic_vector(31 downto 0));
+         
 
 end Decoder;
 
@@ -54,13 +55,10 @@ architecture structure of Decoder is
 			   b : out std_logic_vector(31 downto 0)); 
    end component;
 
-   signal ctrlRegWriteID : std_logic;
-   signal ctrlMemtoRegID : std_logic;
-   signal ctrlMemWriteID : std_logic;
-   signal ctrlALUopID : std_logic_vector(6 downto 0);
-   signal ctrlALUsrcID : std_logic;
-   signal ctrlRegDestID : std_logic;
-   signal ctrlByteID : std_logic;
+
+   signal ctrlBranchID : std_logic;
+   signal ctrlBEQID : std_logic;
+   
    signal srcAID : std_logic_vector(31 downto 0);
    signal srcBID : std_logic_vector(31 downto 0);
    signal rtID : std_logic_vector(4 downto 0);
@@ -68,12 +66,15 @@ architecture structure of Decoder is
    signal signImmID : std_logic_vector(31 downto 0);
    signal jumpImmID : std_logic_vector(31 downto 0);
    signal PClocationID : std_logic_vector(31 downto 0));
+    
 
+   
+   signal ALUopID : std_logic_vector (6 downto 0);
    signal addrA : std_logic_vector(4 downto 0); 
    signal addrB : std_logic_vector(4 downto 0);
    signal regA : std_logic_vector(31 downto 0);
    signal regB : std_logic_vector(31 downto 0);
-   signal signExt : std_logic_vector(31 downto 0);
+
 
 
 
@@ -102,20 +103,39 @@ begin
    --001 0010   STB 
    --001 0011   STW
    --001 0100   MOV
+   --001 0101   MOVI
         
 	--011 0000   BEQ
    --011 0001   JUMP
-   --011 0010   TLBWRITE
-   --011 0011   IRET
+   --011 0010   TLBWRITE  // Not supported as for now
+   --011 0011   IRET      // Not supported as for now
        
 
 
 
 
    --control unit signals
+   ctrlRegWriteEX <= '1' when ALUopID="0000000" or ALUopID="0000001" or ALUopID="0000010"  --ALU ops
+                           or ALUopID="0010000" or ALUopID="0010001"                       --LDs
+                           or ALUopID="0010100" or ALUopID="0010101" else                  --MOVs
+                     '0';
 
+   ctrlMemtoRegEX <= '1' when ALUopID="0010000" or ALUopID="0010001" else
+                     '0';
+   
+   ctrlMemWriteEX <= '1' when ALUopID="0010010" or ALUopID="0010011" else
+                     '0';
 
+   ctrlBEQID <= '1' when (signed(srcAID) = signed(srcBEX)) else
+                '0'; 
+   ctrlBranchID <= '1' when ALUopID="0110000" and ctrlBEQID = '1' else
+                   '0';
 
+   ctrlJumpIF <= '1' when ALUopID="0110001" or ctrlBranchID = '1' else
+                 '0'
+   
+   
+   
 
 
 
@@ -129,15 +149,15 @@ begin
    
    --end bypasses
 
-
+   ALUopID <= InstID(31 downto 25);
    addrA <= InstID(24 downto 20);
    addrB <= InstID(19 downto 15);
    srcAID <= regA; --TODO: or Bypasses comp with rtID/rdID
    srcBID <= regB; --TODO: or Bypasses comp with rtID/rdID
 
-   signExt(14 downto 0) <= InstID(14 downto 0);
-   signExt(31 downto 15) <= (others = InstID(14));
-   jumpImm <= std_logic_vector(shift_left(signed(signExt),2);
+   signImmID(14 downto 0) <= InstID(14 downto 0);
+   signImmID(31 downto 15) <= (others = InstID(14));
+   jumpImmID <= std_logic_vector(shift_left(signed(signExt),2);
    PClocationID <= std_logic_vector(signed(jumpImm) + signed(PCplus4ID));
 
    rtID <= InstID(24 downto 20);
@@ -149,7 +169,8 @@ begin
    srcBEX <= srcBID;
    rtEX <= rtID;
    rdEX <= rdID;
-   signImmEX <= signExt; 
+   signImmEX <= signImmID;
+   PClocationIF <= PClocationID; 
 
 
 

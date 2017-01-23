@@ -27,6 +27,7 @@ architecture structure of alu is
    --001 0010   STB 
    --001 0011   STW
    --001 0100   MOV
+   --001 0101   MOVI
         
 	--011 0000   BEQ
    --011 0001   JUMP
@@ -43,7 +44,8 @@ begin
               std_logic_vector(signed(x) - signed(y)) when op = "0000001" else
               std_logic_vector(signed(x) + signed(y));	
 	
-   memReg <= std_logic_vector(signed(x) + signed(y));
+   memReg <= y when op = "0010101" else
+             std_logic_vector(signed(x) + signed(y));
 
    branchReg <= std_logic_vector(signed(x) + signed(y));
 
