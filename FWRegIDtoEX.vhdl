@@ -16,13 +16,14 @@ entity FWRegIDtoEX is
          ctrlALUsrcID : in std_logic;
          ctrlRegDestID : in std_logic;
          ctrlByteID : in std_logic;
+         ctrlBypassAID : in std_logic;
+         ctrlBypassBID : in std_logic;
 
          srcAID : in std_logic_vector(31 downto 0);
          srcBID : in std_logic_vector(31 downto 0);
          rtID : in std_logic_vector(4 downto 0);
          rdID : in std_logic_vector(4 downto 0);
          signImmID : in std_logic_vector(31 downto 0);
-         --jumpImmID : in std_logic_vector(31 downto 0);
 
          ctrlRegWriteEX : out std_logic;
          ctrlMemtoRegEX : out std_logic;
@@ -31,13 +32,15 @@ entity FWRegIDtoEX is
          ctrlALUsrcEX : out std_logic;
          ctrlRegDestEX : out std_logic;
          ctrlByteEX : out std_logic;
+         ctrlBypassAEX : out std_logic;
+         ctrlBypassBEX : out std_logic;
 
          srcAEX : out std_logic_vector(31 downto 0);
          srcBEX : out std_logic_vector(31 downto 0);
          rtEX : out std_logic_vector(4 downto 0);
          rdEX : out std_logic_vector(4 downto 0);
          signImmEX : out std_logic_vector(31 downto 0));
-         --jumpImmEX : out std_logic_vector(31 downto 0));
+
 
 end FWRegIDtoEX;
 
@@ -70,6 +73,9 @@ begin
    fCtrlALUsrc : FWReg1 port map(ctrlALUsrcID,clk,we,reset,ctrlALUsrcEX);
    fCtrlRegDest : FWReg1 port map(ctrlRegDestID,clk,we,reset,ctrlRegDestEX);
    fCtrlByte : FWReg1 port map(ctrlByteID,clk,we,reset,ctrlByteEX);
+   fCtrlBypassA : FWReg1 port map(ctrlBypassAID,clk,we,reset,ctrlBypassAEX);
+   fCtrlBypassB : FWReg1 port map(ctrlBypassBID,clk,we,reset,ctrlBypassBEX);
+
 
    fSrcA : FWReg Generic map(32) port map(srcAID,clk,we,reset,srcAEX);
    fSrcB : FWReg Generic map(32) port map(srcBID,clk,we,reset,srcBEX);

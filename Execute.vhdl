@@ -12,17 +12,20 @@ entity Execute is
          ctrlALUsrcEX : in std_logic;
          ctrlRegDestEX : in std_logic;
          ctrlByteEX : in std_logic;
+         ctrlBypassAEX : in std_logic;
+         ctrlBypassBEX : in std_logic;
          
          srcAEX : in std_logic_vector(31 downto 0);
          srcBEX : in std_logic_vector(31 downto 0);
          rtEX : in std_logic_vector(4 downto 0);
          rdEX : in std_logic_vector(4 downto 0);
          signImmEX : in std_logic_vector(31 downto 0);
-         --jumpImmEX : in std_logic_vector(31 downto 0);
+         readDataM : in std_logic_vector(31 downto 0);
          
          ctrlRegWriteM : out std_logic;
          ctrlMemtoRegM : out std_logic;
          ctrlMemWriteM  : out std_logic;
+         ctrlALUopM : in std_logic_vector(6 downto 0);
          ctrlByteM : out std_logic;
 
          ALUoutM : out std_logic_vector(31 downto 0);
@@ -44,24 +47,31 @@ architecture structure of Execute is
    
    signal prvSrcBEX : std_logic_vector(31 downto 0);
    signal prvALUoutEX : std_logic_vector(31 downto 0);
+   signal bypassA : std_logic_vector(31 downto 0);
+   signal bypassB : std_logic_vector(31 downto 0);
    
 
 begin
 
    alu0 : alu
-   Port Map(x => srcAEX,
+   Port Map(x => bypassA,
             y => prvSrcBEX,
             op => ctrlALUopEX,
             w =>  prvALUoutEX);
 
+   bypassA <= readDataM when ctrlBypassAEX='1' else
+              srcAEX;
 
-   prvSrcBEX(31 downto 0) <= srcBEX(31 downto 0) when ctrlALUsrcEX = '0' else
+   bypassB <= readDataM when ctrlBypassBEX='1' else
+              srcBEX;  
+
+   prvSrcBEX(31 downto 0) <= bypassB(31 downto 0) when ctrlALUsrcEX = '0' else
                              signImmEX(31 downto 0);
 
    writeRegM(4 downto 0) <= rtEX(4 downto 0) when ctrlRegDestEX = '0' else
                             rdEX(4 downto 0);
     
-   writeDataM(31 downto 0) <= srcBEX(31 downto 0);
+   writeDataM(31 downto 0) <= bypassB(31 downto 0);
 
    ALUoutM(31 downto 0) <= prvALUoutEX(31 downto 0);
 
@@ -70,6 +80,7 @@ begin
    ctrlRegWriteM <= ctrlRegWriteEX;
    ctrlMemtoRegM <= ctrlMemtoRegEX;
    ctrlMemWriteM <= ctrlMemWriteEX;
+   ctrlALUopM <= ctrlALUopEX;
    ctrlByteM <= ctrlByteEX;
 
 

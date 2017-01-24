@@ -4,7 +4,6 @@ use IEEE.numeric_std.all;
 
 
 entity FWRegIFtoID is
-
    port (clk : in std_logic;
          we : in std_logic;
          reset : in std_logic;
@@ -13,9 +12,6 @@ entity FWRegIFtoID is
          PCplus4IF : in std_logic_vector(31 downto 0);
          instID : out std_logic_vector(31 downto 0);
          PCplus4ID : out std_logic_vector(31 downto 0));
-
-         
-
 end FWRegIFtoID;
 
 
