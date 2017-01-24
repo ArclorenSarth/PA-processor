@@ -251,9 +251,9 @@ end component;
 
 
 
-   signal clk : std_logic;
-   signal weFW : std_logic;
-   signal reset : std_logic;
+   signal clk : std_logic := '0';
+   signal weFW : std_logic := '0';
+   signal reset : std_logic := '0';
 
 
    signal ALUoutMtoFW : std_logic_vector(31 downto 0);
@@ -429,31 +429,28 @@ begin
    ctrlALUopMtoFW  <= "0000000";
    ctrlALUopWBtoID <="0000001";
    readDataMtoEX <= x"00000010";
-
+   cacheDhitMtoID <= '1';
    
    test_execute: process 
    begin
-   loop
-      wait for 2 ns;
       reset <= '1';
-      wait for 2 ns;
+      wait until rising_edge(clk); 
       reset <= '0';
-      wait for 10 ns;     
-   end loop;
+      wait;
    end process;
 
+   --reset <= '1' after 4 ns, '0' after 4 ns;
+   clk <= not clk after 2 ns;
 
-
-
-   clock: process 
-   begin
-   loop
-      clk <= '0'; 
-      wait for 1 ns;
-      clk <= '1';
-      wait for 1 ns;
-   end loop;
-   end process;
+   --clock: process 
+   --begin
+   --loop
+     -- clk <= '0'; 
+      --wait for 1 ns;
+      --clk <= '1';
+     -- wait for 1 ns;
+   --end loop;
+   --end process;
 
 
 end structure;

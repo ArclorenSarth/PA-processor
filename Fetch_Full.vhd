@@ -105,7 +105,7 @@ entity Fetch_Full is
 
                 PC<=PCPlus4F;
 
-                PCPlus4F <= PCF+X"00000004" when (muxIF='1' and reset='0') else PCLocation;
+                PCPlus4F <= PCF+X"00000004" when muxIF='0' else PCLocation;
 
                 --inst <= inst_data;
     
