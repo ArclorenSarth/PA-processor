@@ -5,7 +5,8 @@ use IEEE.numeric_std.all;
 
 entity Decoder is
    port (clk : in std_logic;
-         cacheMiss : in std_logic;
+         cacheIHitIF : in std_logic;
+         cacheDHitM : in std_logic;
          InstID : in std_logic_vector(31 downto 0);
          PCplus4ID : in std_logic_vector(31 downto 0);
          
@@ -118,7 +119,7 @@ begin
    --000 0001   SUB  
    --000 0010   MUL
       
-	--001 0000   LDB 
+   --001 0000   LDB 
    --001 0001   LDW
    --001 0010   STB 
    --001 0011   STW
@@ -171,7 +172,8 @@ begin
    ctrlBypassBEX <= '1' when isLDEX='1' and addrB=writeRegEX else
                     '0';
 
-   forwardingWE <= '1'; --TODO: CACHE MISS CONTROL AND THAT
+   forwardingWE <= '1' when cacheIhitIF = '1' and cacheDhitM='1' else
+                   '0'; --CACHE MISS CONTROL AND THAT
 
    --TODO: PROCESS FOR MUL OPERATIONS AND THAT
    
