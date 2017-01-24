@@ -10,7 +10,8 @@ entity Fetch_Full is
           reset : in std_logic;
           FWWE : in std_logic;
           PCLocation : in std_logic_vector(31 downto 0);
-          inst, PC : out std_logic_vector(31 downto 0));
+          inst, PC : out std_logic_vector(31 downto 0),
+          cacheIhitID : out std_logic);
     end Fetch_Full;
     
 
@@ -29,7 +30,7 @@ entity Fetch_Full is
 
     --CACHE Signals
         signal Addr_on_miss: std_logic_vector(31 downto 0);
-        signal fwwe_in : std_logic;
+        --signal fwwe_in : std_logic;
 
 
 
@@ -69,7 +70,7 @@ entity Fetch_Full is
                                    data_out => cache_out,
                                    hit => hit_in);
             ADDR_in <= PCF;
-            fwwe_in<=hit_in;
+            cacheIhitID<=hit_in;
 
             cache_miss: process(clk) 
                     begin
@@ -100,7 +101,7 @@ entity Fetch_Full is
 
             -- PC
 
-                PCregister : Reg generic map(32) port map(PCPlus4F,clk,fwwe_in,reset,PCF);
+                PCregister : Reg generic map(32) port map(PCPlus4F,clk,FWWE,reset,PCF);
 
                 PC<=PCPlus4F;
 
