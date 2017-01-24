@@ -7,15 +7,18 @@ use std.textio.all;
 --- NON GENERIC CACHE -- 4 lines of 128 bits each = 512 bits
 entity DataCache is 
 	port(ADDR: in  std_logic_vector(31 downto 0);
-		 RW : in std_logic; --- 0=READ / 1=WRITE
-		 RW_CONTROL: in std_logic; --- 0=Read permision / 1 = write permision
+		 RW_Cache : in std_logic; --- 0=READ / 1=WRITE
+		 RW_CONTROL_Cache: in std_logic; --- 0=Read permision / 1 = write permision
+		 RW_MEM: in std_logic;
+		 RW_CONTROL_MEM: in std_logic; 
 		 BYTE: in std_logic;
 		 WORD: in std_logic;
-		 CPU_OR_MEM: in std_logic; --- 0=MEMORY / 1=CPU
-		 DATA_IN_FROM_MEMORY: in std_logic_vector(127 downto 0);
+		 DATA_IN_FROM_MEMORY: in std_logic_vector(127 downto 0);			
 		 DATA_IN_FROM_DATAPATH: in std_logic_vector(31 downto 0);
 		 data_out_to_memory: out std_logic_vector(127 downto 0);
 		 data_out_to_path: out std_logic_vector(31 downto 0);
+		 adress_to_memory: out std_logic_vector(31	downto 0);
+		 dirty: out std_logic;
 		 hit: out std_logic); ----0=miss / 1=hit
 
 end DataCache;
@@ -73,21 +76,24 @@ architecture behav of DataCache is
 	signal word_2: std_logic_vector(31 downto 0);
 	signal word_3: std_logic_vector(31 downto 0);
 
+	signal eviction: std_logic;
+
 
 	begin
 		tag <= ADDR(31 downto 6);
 		set <= ADDR(5 downto 4);
 		block_offset <= ADDR(3 downto 2);
 		byte_ofset <= ADDR(1 downto 0);
-
-		writing_from_memory<= RW and RW_CONTROL and not CPU_OR_MEM;
-		writing_from_cpu <= RW and RW_CONTROL and CPU_OR_MEM;
-		reading_from_memory<=not RW and RW_CONTROL and not CPU_OR_MEM;
-		reading_from_cache<= not RW and RW_CONTROL and CPU_OR_MEM;
+		eviction<= (not tag_eq or not valid_store(to_integer(unsigned(set)))) and dirty_store(to_integer(unsigned(set)));
+		writing_from_memory<= RW_MEM and RW_CONTROL_MEM;
+		writing_from_cpu <= RW_Cache and RW_CONTROL_Cache;
+		reading_from_memory<=not RW_MEM and RW_CONTROL_MEM; 
+		reading_from_cache<= not RW_Cache and RW_CONTROL_Cache;
 		--ON READ
-		tag_eq <= '1' when to_integer(unsigned(tag_store(to_integer(unsigned(set)))))= to_integer(unsigned(tag)) and RW_CONTROL='1' else '0';
+		tag_eq <= '1' when to_integer(unsigned(tag_store(to_integer(unsigned(set)))))= to_integer(unsigned(tag)) else '0';
 		hit <= '1' when (tag_eq='1' and valid_store(to_integer(unsigned(set)))='1') else '0';
 		input_byte<=DATA_IN_FROM_DATAPATH(7 downto 0);
+		dirty<=dirty_store(to_integer(unsigned(set)));
 
 		byte_0_0 <= data_store(to_integer(unsigned(set)))(7 downto 0);
 		byte_0_1 <= data_store(to_integer(unsigned(set)))(15 downto 8);
@@ -131,15 +137,16 @@ architecture behav of DataCache is
 							byte_out when BYTE='1' and WORD='0' else
 							"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
-		data_out_to_memory<=data_store(to_integer(unsigned(set))) when (tag_eq='0' or valid_store(to_integer(unsigned(set)))='0') and dirty_store(to_integer(unsigned(set)))='1';
+		data_out_to_memory<=data_store(to_integer(unsigned(set))) when eviction='1' else "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+		adress_to_memory<= tag_store(to_integer(unsigned(set)))&set&block_offset&"00" when eviction='1' else
+							ADDR;
 
 
 
 
 		--ON WRITE
-		data_store(to_integer(unsigned(set))) <= data_store(to_integer(unsigned(set))) when reading_from_cache='1' else 
-
-												 DATA_IN_FROM_MEMORY when writing_from_memory='1' and writing_from_cpu='0' else
+		
+		data_store(to_integer(unsigned(set))) <= DATA_IN_FROM_MEMORY when writing_from_memory='1' else
 
 												 DATA_IN_FROM_DATAPATH & data_store(to_integer(unsigned(set)))(95 downto 0) when WORD='1' and writing_from_cpu='1' and  block_offset="11" else
 												 	input_byte & data_store(to_integer(unsigned(set)))(119 downto 0) when BYTE='1' and writing_from_cpu='1' and  block_offset="11" and byte_ofset="11" else
@@ -176,7 +183,7 @@ architecture behav of DataCache is
 
 		tag_store(to_integer(unsigned(set))) <= tag when writing_from_memory='1'; 
 
-		dirty_store(to_integer(unsigned(set))) <='1' when writing_from_cpu='1' else
+		dirty_store(to_integer(unsigned(set))) <='1' when writing_from_cpu='1' and (tag_eq='1' and valid_store(to_integer(unsigned(set)))='1')  else
 												  '0' when reading_from_memory='1' else
 												  dirty_store(to_integer(unsigned(set)));	
 
