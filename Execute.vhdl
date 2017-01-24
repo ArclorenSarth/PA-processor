@@ -25,7 +25,7 @@ entity Execute is
          ctrlRegWriteM : out std_logic;
          ctrlMemtoRegM : out std_logic;
          ctrlMemWriteM  : out std_logic;
-         ctrlALUopM : in std_logic_vector(6 downto 0);
+         ctrlALUopM : out std_logic_vector(6 downto 0);
          ctrlByteM : out std_logic;
 
          ALUoutM : out std_logic_vector(31 downto 0);

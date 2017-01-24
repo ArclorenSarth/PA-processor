@@ -55,7 +55,7 @@ begin
    fCtrlRegWrite : FWReg1 port map(ctrlRegWriteEX,clk,we,reset,ctrlRegWriteM);
    fCtrlMemtoReg : FWReg1 port map(ctrlMemtoRegEX,clk,we,reset,ctrlMemtoRegM);
    fCtrlMemWrite : FWReg1 port map(ctrlMemWriteEX,clk,we,reset,ctrlMemWriteM);
-   fCtrlALUop: FWReg Generic port map(7) map(ctrlALUopEX,clk,we,reset,cltrALUopM);
+   fCtrlALUop: FWReg Generic map(7) port map(ctrlALUopEX,clk,we,reset,ctrlALUopM);
    fCtrlByte : FWReg1 port map(ctrlByteEX,clk,we,reset,ctrlByteM);
    fALUout : FWReg Generic map(32) port map(ALUoutEX,clk,we,reset,ALUoutM);
    fWriteData : FWReg Generic map(32) port map(writeDataEX,clk,we,reset,writeDataM);

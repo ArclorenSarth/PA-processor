@@ -42,7 +42,7 @@ entity Decoder is
          rtEX : out std_logic_vector(4 downto 0);
          rdEX : out std_logic_vector(4 downto 0);
          signImmEX : out std_logic_vector(31 downto 0);
-         ctrlJumpIF : out std_logic
+         ctrlJumpIF : out std_logic;
          PClocationIF : out std_logic_vector(31 downto 0);
          forwardingWE : out std_logic);
          
@@ -77,7 +77,7 @@ architecture structure of Decoder is
    signal jumpImmID : std_logic_vector(31 downto 0);
    signal branchLocID : std_logic_vector(31 downto 0);
    signal jumpLocID : std_logic_vector(31 downto 0);
-   signal PClocationID : std_logic_vector(31 downto 0));
+   signal PClocationID : std_logic_vector(31 downto 0);
     
 
    
@@ -147,7 +147,7 @@ begin
    ctrlMemWriteEX <= '1' when ALUopID="0010010" or ALUopID="0010011" else
                      '0';
 
-   ctrlBEQID <= '1' when (signed(srcAID) = signed(srcBEX)) else
+   ctrlBEQID <= '1' when (signed(srcAID) = signed(srcBID)) else
                 '0'; 
    ctrlBranchID <= '1' when ALUopID="0110000" and ctrlBEQID = '1' else
                    '0';
@@ -221,18 +221,18 @@ begin
    --srcBID <= regB; --DONE ALREADY ON BYPASSES
 
    signImmID(14 downto 0) <= InstID(14 downto 0);
-   signImmID(31 downto 15) <= (others = InstID(14));
+   signImmID(31 downto 15) <= (others => InstID(14));
    
    branchImmID(9 downto 0) <= InstID(9 downto 0);
    branchImmID(14 downto 10) <= InstID(24 downto 20);
-   branchImmID(31 downto 15) <= (others = InstID(24));
+   branchImmID(31 downto 15) <= (others => InstID(24));
 
    jumpImmID(14 downto 0) <= InstID(14 downto 0);
    jumpImmID(19 downto 15) <= InstID(24 downto 20);
-   jumpImmID(31 downto 25) <= (others = InstID(24));  
+   jumpImmID(31 downto 25) <= (others => InstID(24));  
 
-   branchLocID <= (std_logic_vector(signed(shift_left(signed(branchImmID),2)) + signed(PCplus4ID));   
-   jumpLocID <= (std_logic_vector(signed(shift_left(signed(jumpImmID),2)) + signed(PCplus4ID));
+   branchLocID <= (std_logic_vector(signed(shift_left(signed(branchImmID),2)) + signed(PCplus4ID)));   
+   jumpLocID <= (std_logic_vector(signed(shift_left(signed(jumpImmID),2)) + signed(PCplus4ID)));
    
    PClocationID <= jumpLocID when ALUopID="0110001" else
                    branchLocID;                          --std_logic_vector(signed(jumpImm) + signed(PCplus4ID));

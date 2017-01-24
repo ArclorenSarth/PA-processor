@@ -10,7 +10,7 @@ entity Fetch_Full is
           reset : in std_logic;
           FWWE : in std_logic;
           PCLocation : in std_logic_vector(31 downto 0);
-          inst, PC : out std_logic_vector(31 downto 0),
+          inst, PC : out std_logic_vector(31 downto 0);
           cacheIhitID : out std_logic);
     end Fetch_Full;
     

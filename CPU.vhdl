@@ -9,15 +9,15 @@ end CPU;
 
 architecture structure of CPU is
 
-entity Fetch_Full is
+component Fetch_Full is
     port (clk : in std_logic;
           muxIF : in std_logic;
           reset : in std_logic;
           FWWE : in std_logic;
           PCLocation : in std_logic_vector(31 downto 0);
-          inst, PC : out std_logic_vector(31 downto 0),
+          inst, PC : out std_logic_vector(31 downto 0);
           cacheIhitID: out std_logic);
-end Fetch_Full;
+end component;
 
    signal ctrlJumpIDtoIF : std_logic;
    signal PCLocationIDtoIF : std_logic_vector(31 downto 0);
@@ -78,7 +78,7 @@ component Decoder is
          rtEX : out std_logic_vector(4 downto 0);
          rdEX : out std_logic_vector(4 downto 0);
          signImmEX : out std_logic_vector(31 downto 0);
-         ctrlJumpIF : out std_logic
+         ctrlJumpIF : out std_logic;
          PClocationIF : out std_logic_vector(31 downto 0);
          forwardingWE : out std_logic);
          
@@ -201,7 +201,7 @@ component Execute is
 
 end component;
    
-   signal readDataMtoEX : in std_logic_vector(31 downto 0);
+   signal readDataMtoEX : std_logic_vector(31 downto 0);
    --signals tmp betweent Execute and FW
    signal ctrlRegWriteEXtoFW : std_logic;
    signal ctrlMemtoRegEXtoFW : std_logic;
@@ -284,7 +284,7 @@ begin
           muxIF => ctrlJumpIDtoIF,
           reset => reset,
           FWWE => weFW,
-          PCLocation => PCLocationIDtoIF;
+          PCLocation => PCLocationIDtoIF,
           inst => instIFtoFW, 
           PC => PCplus4IFtoFW,
           cacheIhitID => cacheIhitIFtoID);
@@ -329,7 +329,7 @@ begin
          ctrlByteEX => ctrlByteIDtoFW,
          ctrlBypassAEX => ctrlBypassAIDtoFW,
          ctrlBypassBEX => ctrlBypassBIDtoFW,
-         srcAEX => srcAIDtoFW
+         srcAEX => srcAIDtoFW,
          srcBEX => srcBIDtoFW,
          rtEX => rtIDtoFW,
          rdEX => rdIDtoFW,
@@ -428,6 +428,7 @@ begin
    writeRegMtoFW <= "00011";
    ctrlALUopMtoFW  <= "0000000";
    ctrlALUopWBtoID <="0000001";
+   readDataMtoEX <= x"00000010";
 
    
    test_execute: process 
