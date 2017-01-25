@@ -136,9 +136,11 @@ begin
 
 
    --------------------------------control unit signals--------------------------------------
-   ctrlRegWriteEX <= '1' when ALUopID="0000000" or ALUopID="0000001" or ALUopID="0000010"  --ALU ops
+   ctrlRegWriteEX <= '0' when InstID=x"00000000" else
+                     '1' when ALUopID="0000000" or ALUopID="0000001" or ALUopID="0000010"  --ALU ops
                            or ALUopID="0010000" or ALUopID="0010001"                       --LDs
                            or ALUopID="0010100" or ALUopID="0010101" else                  --MOVs
+                     
                      '0';
 
    ctrlMemtoRegEX <= '1' when ALUopID="0010000" or ALUopID="0010001" else
@@ -172,7 +174,7 @@ begin
    ctrlBypassBEX <= '1' when isLDEX='1' and addrB=writeRegEX else
                     '0';
 
-   forwardingWE <= '0' when cacheIhitIF='0' else --or cacheDhitM='0' else
+   forwardingWE <= '0' when cacheIhitIF='0' or cacheDhitM='0' else
                    '1'; --CACHE MISS CONTROL AND THAT
 
    --TODO: PROCESS FOR MUL OPERATIONS AND THAT
@@ -229,7 +231,7 @@ begin
 
    jumpImmID(14 downto 0) <= InstID(14 downto 0);
    jumpImmID(19 downto 15) <= InstID(24 downto 20);
-   jumpImmID(31 downto 25) <= (others => InstID(24));  
+   jumpImmID(31 downto 20) <= (others => InstID(24));  
 
    branchLocID <= (std_logic_vector(signed(shift_left(signed(branchImmID),2)) + signed(PCplus4ID)));   
    jumpLocID <= (std_logic_vector(signed(shift_left(signed(jumpImmID),2)) + signed(PCplus4ID)));

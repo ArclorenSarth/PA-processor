@@ -17,7 +17,7 @@ entity Fetch_Full is
 
     architecture behaviour of Fetch_Full is
     --PC Signals
-        signal PC_local: std_logic_vector(31 downto 0);
+        signal PClocal: std_logic_vector(31 downto 0);
         signal PCF: std_logic_vector(31 downto 0);
         signal PCPlus4F: std_logic_vector(31 downto 0);
 
@@ -101,11 +101,14 @@ entity Fetch_Full is
 
             -- PC
 
-                PCregister : Reg generic map(32) port map(PCPlus4F,clk,FWWE,reset,PCF);
+                PCregister : Reg generic map(32) port map(PCPlus4F,clk,FWWE,reset,PClocal);
+                  
 
                 PC<=PCPlus4F;
 
-                PCPlus4F <= PCF+X"00000004" when muxIF='0' else PCLocation;
+                --PCPlus4F <= PCF+X"00000004" when muxIF='0' else PCLocation;
+                PCPlus4F <= PCF+X"00000004";
+                PCF <= PClocal when muxIF='0' else PCLocation;
 
                 --inst <= inst_data;
     

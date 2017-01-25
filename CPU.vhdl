@@ -495,6 +495,9 @@ begin
 
 
 
+   resultWBtoID <= readDataFWtoWB when ctrlMemtoRegFWtoWB='1' else
+                   ALUoutFWtoWB;
+
    
    test_execute: process 
    begin

@@ -45,12 +45,12 @@ begin
               std_logic_vector(signed(x) + signed(y));	
 	
    memReg <= y when op = "0010101" else
-             std_logic_vector(signed(x) + signed(y));
+             x"00000000";
 
-   branchReg <= std_logic_vector(signed(x) + signed(y));
+   branchReg <= x"00000000";
 
    w(31 downto 0) <= aritReg(31 downto 0) when op <= "0000010" and op >= "0000000" else
-                     memReg(31 downto 0) when op <= "0010100" and op >= "0010000" else
+                     memReg(31 downto 0) when op <= "0010101" and op >= "0010000" else
                      branchReg(31 downto 0);
 
 
