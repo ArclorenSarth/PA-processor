@@ -61,6 +61,7 @@ begin
       procedure read_hex_integer(L: inout line; value: out integer) is
         variable ch: character;
         variable result: integer;
+        --variable L : line;
       begin
         result := 0;
 
@@ -76,6 +77,24 @@ begin
         value := result;
       end read_hex_integer;
 
+      procedure read_bin_to_std_vector(L: inout line; value: out std_logic_vector(31 downto 0)) is
+        variable ch: character;
+        variable result: integer;
+        --variable L : line;
+      begin
+        result := 0;
+
+        for i in 0 to 31 loop
+          read(L, ch);
+          if (ch ='0') then
+            value(31-i):='0';
+          else
+            value(31-i):='1';
+          end if;
+        end loop;
+
+      end read_bin_to_std_vector;
+
       --
       -- load initial memory contents from text-file
       -- and print a copy to stdout...
@@ -87,7 +106,7 @@ begin
         variable add, val, i : integer;
         variable c : character;
 
-        variable val_bits : std_logic_vector(31 downto 0);
+        variable  val_bits : std_logic_vector(31 downto 0);
 
       begin
         write( output, "sram initialization:" );
@@ -100,7 +119,8 @@ begin
            readline(binary_file, L );
            read_hex_integer(L, add);
            read(L, c); -- delimiting space
-           read_hex_integer(L, val);
+           --read_hex_integer(L, val);
+           read_bin_to_std_vector(L,val_bits);
 
            --
            write( L, add);
@@ -108,7 +128,7 @@ begin
            write( L, val);
            writeline( output, L );
            --
-           val_bits := conv_std_logic_vector(val, 32);
+           --val_bits := conv_std_logic_vector(val, 32);
            mem( add ) := val_bits(7 downto 0);
            mem( add + 1 ) := val_bits(15 downto 8);
            mem( add + 2 ) := val_bits(23 downto 16);
