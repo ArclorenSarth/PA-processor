@@ -41,10 +41,10 @@ architecture behav of DataCache is
 	signal valid_store: valid_store_type := "0000";
 	signal dirty_store: dirt_store_type := "0000";
 
-	signal writing_from_memory: std_logic;
-	signal writing_from_cpu: std_logic;
-	signal reading_from_memory: std_logic;
-	signal reading_from_cache:std_logic;
+	signal writing_from_memory: std_logic:='0';
+	signal writing_from_cpu: std_logic:='0';
+	signal reading_from_memory: std_logic:='0';
+	signal reading_from_cache:std_logic:='0';
 
 	signal word_out: std_logic_vector(31 downto 0);
 	signal byte_out: std_logic_vector(31 downto 0);
@@ -77,6 +77,7 @@ architecture behav of DataCache is
 	signal word_3: std_logic_vector(31 downto 0);
 
 	signal eviction: std_logic;
+	signal idle: std_logic;
 
 
 	begin
@@ -85,15 +86,16 @@ architecture behav of DataCache is
 		block_offset <= ADDR(3 downto 2);
 		byte_ofset <= ADDR(1 downto 0);
 		eviction<= (not tag_eq or not valid_store(to_integer(unsigned(set)))) and dirty_store(to_integer(unsigned(set)));
-		writing_from_memory<= RW_MEM and RW_CONTROL_MEM;
-		writing_from_cpu <= RW_Cache and RW_CONTROL_Cache;
-		reading_from_memory<=not RW_MEM and RW_CONTROL_MEM; 
-		reading_from_cache<= not RW_Cache and RW_CONTROL_Cache;
+		writing_from_memory<= '1' when (RW_MEM='1' and RW_CONTROL_MEM='1') else '0';
+		writing_from_cpu <= '1' when (RW_Cache='1' and RW_CONTROL_Cache='1') else '0';
+		reading_from_memory<= '1' when (RW_MEM='0' and RW_CONTROL_MEM='1') else '0'; 
+		reading_from_cache<= '1' when (RW_Cache='0' and RW_CONTROL_Cache='1') else '0';
 		--ON READ
 		tag_eq <= '1' when to_integer(unsigned(tag_store(to_integer(unsigned(set)))))= to_integer(unsigned(tag)) else '0';
-		hit <= '1' when (tag_eq='1' and valid_store(to_integer(unsigned(set)))='1') else '0';
+		hit <= '1' when (tag_eq='1' and valid_store(to_integer(unsigned(set)))='1') or idle='1' else '0';
 		input_byte<=DATA_IN_FROM_DATAPATH(7 downto 0);
 		dirty<=dirty_store(to_integer(unsigned(set)));
+		idle<='1' when (writing_from_cpu='0' and writing_from_memory='0' and reading_from_cache='0' and reading_from_memory='0') else '0';
 
 		byte_0_0 <= data_store(to_integer(unsigned(set)))(7 downto 0);
 		byte_0_1 <= data_store(to_integer(unsigned(set)))(15 downto 8);

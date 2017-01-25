@@ -67,6 +67,7 @@ begin
             REGWRITEM_in<='1';
             WRITEREGM_in<="00001";
                 --CPU_OR_MEM_in<='1'
+                wait for 2 ns;
             wait until hit_in='1';
 
             ALUOUTM_in<=X"00000000"; 
