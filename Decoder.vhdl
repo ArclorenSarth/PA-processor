@@ -172,8 +172,8 @@ begin
    ctrlBypassBEX <= '1' when isLDEX='1' and addrB=writeRegEX else
                     '0';
 
-   forwardingWE <= '1' when cacheIhitIF = '1' and cacheDhitM='1' else
-                   '0'; --CACHE MISS CONTROL AND THAT
+   forwardingWE <= '0' when cacheIhitIF='0' else --or cacheDhitM='0' else
+                   '1'; --CACHE MISS CONTROL AND THAT
 
    --TODO: PROCESS FOR MUL OPERATIONS AND THAT
    
