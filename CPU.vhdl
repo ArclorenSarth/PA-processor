@@ -422,7 +422,7 @@ begin
             rtEX => rtFWtoEX,
             rdEX => rdFWtoEX,
             signImmEX => signImmFWtoEX,
-            readDataM => readDataMtoEX,
+            readDataM => readDataMtoFW,
             ctrlRegWriteM => ctrlRegWriteEXtoFW,
             ctrlMemtoRegM => ctrlMemtoRegEXtoFW,
             ctrlMemWriteM => ctrlMemWriteEXtoFW,
