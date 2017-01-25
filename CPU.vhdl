@@ -86,18 +86,7 @@ component Decoder is
 end component;
 
    signal cacheDhitMtoID : std_logic;
-   signal weWBtoID : std_logic;
-   signal resultWBtoID : std_logic_vector(31 downto 0);
-   signal writeRegWBtoID : std_logic_vector(4 downto 0);
--- BYPASSES
-   signal ALUoutEXtoID : std_logic_vector(31 downto 0);
-   signal ALUoutMtoID : std_logic_vector(31 downto 0);
-   signal readDataMtoID : std_logic_vector(31 downto 0);
-   signal writeRegEXtoID : std_logic_vector(4 downto 0);
-   signal writeRegMtoID : std_logic_vector(4 downto 0);
-   signal ALUopOldEXtoID : std_logic_vector(6 downto 0);
-   signal ALUopOldMtoID : std_logic_vector(6 downto 0);
-   signal ALUopOldWBtoID : std_logic_vector(6 downto 0);
+
 -- SIGNALS between ID and FW
    signal ctrlRegWriteIDtoFW : std_logic;
    signal ctrlMemtoRegIDtoFW : std_logic;
@@ -248,6 +237,64 @@ end component;
    signal writeDataFWtoM : std_logic_vector(31 downto 0);
    signal writeRegFWtoM : std_logic_vector(4 downto 0);
 
+component Memory is
+    port (ALUOUTM : in std_logic_vector(31 downto 0);
+    	  WRITEDATAM : in std_logic_vector(31 downto 0);
+          MEMWRITEM : in std_logic;
+          MEMTOREGM : in std_logic;
+          ctrlALUopEX : in std_logic_vector(6 downto 0);
+          ctrlByteEX : in std_logic;
+          REGWRITEM : in std_logic;
+          WRITEREGM : in std_logic_vector(4 downto 0);
+          reset : in std_logic;
+          clk : in std_logic;
+          ctrlRegWriteM : out std_logic;
+          ctrlMemtoRegM : out std_logic;
+          ctrlALUopM : out std_logic_vector(6 downto 0);
+          ALUoutMFW : out std_logic_vector(31 downto 0);
+          WRITEREGMFW : out std_logic_vector(4 downto 0);
+          hit_m : out std_logic;
+          ReadData : out std_logic_vector(31 downto 0));
+end component;
+
+
+   signal ALUoutMtoFW : std_logic_vector(31 downto 0);
+   signal readDataMtoFW : std_logic_vector(31 downto 0);
+   signal writeRegMtoFW : std_logic_vector(4 downto 0);
+   signal ctrlALUopMtoFW : std_logic_vector(6 downto 0);
+   signal ctrlRegWriteMtoFW : std_logic;
+   signal ctrlMemtoRegMtoFW : std_logic;
+
+component FWRegMEMtoWB is
+   port (clk : in std_logic;
+         we : in std_logic;
+         reset : in std_logic;
+         
+         ctrlRegWriteM : in std_logic;
+         ctrlMemtoRegM : in std_logic;
+         ctrlALUopM : in std_logic_vector(6 downto 0);
+         ALUoutM : in std_logic_vector(31 downto 0);
+         readDataM : in std_logic_vector(31 downto 0);
+         writeRegM : in std_logic_vector(4 downto 0);
+         
+         ctrlRegWriteWB : out std_logic;
+         ctrlMemtoRegWB : out std_logic;
+         ctrlALUopWB : out std_logic_vector(6 downto 0);
+         ALUoutWB : out std_logic_vector(31 downto 0);
+         readDataWB : out std_logic_vector(31 downto 0);
+         writeRegWB : out std_logic_vector(4 downto 0));
+end component;
+
+   signal ctrlMemtoRegFWtoWB : std_logic;
+   signal ctrlALUopFWtoWB : std_logic_vector(6 downto 0);
+   signal ALUoutFWtoWB : std_logic_vector(31 downto 0);
+   signal readDataFWtoWB : std_logic_vector(31 downto 0);
+   
+   signal weWBtoID : std_logic;
+   signal resultWBtoID : std_logic_vector(31 downto 0);
+   signal writeRegWBtoID : std_logic_vector(4 downto 0);
+   signal ctrlALUopWBtoID : std_logic_vector(6 downto 0);
+   
 
 
 
@@ -255,22 +302,6 @@ end component;
    signal weFW : std_logic := '0';
    signal reset : std_logic := '0';
 
-
-   signal ALUoutMtoFW : std_logic_vector(31 downto 0);
-   signal readDataMtoFW : std_logic_vector(31 downto 0);
-   signal writeRegMtoFW : std_logic_vector(4 downto 0);
-   signal ctrlALUopMtoFW : std_logic_vector(6 downto 0);
-   signal ctrlALUopWBtoID : std_logic_vector(6 downto 0);
-
-
-
- 
-
-   
-
-
-
-   
 
 
    
@@ -420,16 +451,50 @@ begin
          ctrlByteM => ctrlByteFWtoM,
          ALUoutM => ALUoutFWtoM,
          writeDataM => writeDataFWtoM,
-         writeRegM =>writeRegFWtoM);
+         writeRegM => writeRegFWtoM);
+
+    Memory1 : Memory
+    port map(ALUOUTM => ALUoutFWtoM,
+    	  WRITEDATAM => writeDataFWtoM,
+          MEMWRITEM => ctrlMemWriteFWtoM,
+          MEMTOREGM => ctrlMemtoRegFWtoM,
+          ctrlALUopEX => ctrlALUopFWtoM,
+          ctrlByteEX => ctrlByteFWtoM,
+          REGWRITEM => ctrlRegWriteFWtoM,
+          WRITEREGM => writeRegFWtoM,
+          reset => reset,
+          clk => clk,
+          ctrlRegWriteM => ctrlRegWriteMtoFW,
+          ctrlMemtoRegM => ctrlMemtoRegMtoFW,
+          ctrlALUopM => ctrlALUopMtoFW,
+          ALUoutMFW => ALUoutMtoFW,
+          WRITEREGMFW => writeRegMtoFW,
+          hit_m => cacheDhitMtoID,
+          ReadData => readDataMtoFW);
 
 
-   ALUoutMtoFW <= x"00000005";
-   readDataMtoFW <= x"00000006";
-   writeRegMtoFW <= "00011";
-   ctrlALUopMtoFW  <= "0000000";
-   ctrlALUopWBtoID <="0000001";
-   readDataMtoEX <= x"00000010";
-   cacheDhitMtoID <= '1';
+   FWRegMEMtoWB0 : FWRegMEMtoWB 
+   port map(clk => clk,
+         we => weFW,
+         reset => reset,
+         
+         ctrlRegWriteM => ctrlRegWriteMtoFW,
+         ctrlMemtoRegM => ctrlMemtoRegMtoFW,
+         ctrlALUopM => ctrlALUopMtoFW,
+         ALUoutM => ALUoutMtoFW,
+         readDataM => readDataMtoFW,
+         writeRegM => writeRegMtoFW,
+         
+         ctrlRegWriteWB => weWBtoID,
+         ctrlMemtoRegWB => ctrlMemtoRegFWtoWB,
+         ctrlALUopWB => ctrlALUopWBtoID,
+         ALUoutWB => ALUoutFWtoWB,
+         readDataWB => readDataFWtoWB,
+         writeRegWB => writeRegWBtoID);
+
+
+
+
    
    test_execute: process 
    begin

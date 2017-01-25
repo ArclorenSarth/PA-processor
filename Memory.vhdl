@@ -9,10 +9,17 @@ entity Memory is
     	  WRITEDATAM: in std_logic_vector(31 downto 0);
           MEMWRITEM : in std_logic;
           MEMTOREGM: in std_logic;
+          ctrlALUopEX : in std_logic_vector(6 downto 0);
+          ctrlByteEX : in std_logic;
           REGWRITEM: in std_logic;
-          WRITEREGM: inout std_logic_vector(4 downto 0);
+          WRITEREGM: in std_logic_vector(4 downto 0);
           reset : in std_logic;
           clk: in std_logic;
+          ctrlRegWriteM : out std_logic;
+          ctrlMemtoRegM : out std_logic;
+          ctrlALUopM : out std_logic_vector(6 downto 0);
+          ALUoutMFW : out std_logic_vector(31 downto 0);
+          WRITEREGMFW : out std_logic_vector(4 downto 0);
           hit_m: out std_logic;
           ReadData : out std_logic_vector(31 downto 0));
 end Memory;
@@ -61,6 +68,14 @@ end Memory;
 		 		signal eviction: std_logic;
         
     begin
+         
+           ctrlALUopM <= ctrlALUopEX;
+           ALUoutMFW <= ALUOUTM;
+           WRITEREGMFW <= WRITEREGM; 
+           ctrlRegWriteM <= REGWRITEM;
+           ctrlMemtoRegM <= MEMTOREGM;
+
+
             --CACHE
             RW_Cache_in<='0' when MEMTOREGM='1' else
             			 '1' when MEMWRITEM ='1' else
